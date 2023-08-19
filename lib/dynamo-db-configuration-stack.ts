@@ -5,14 +5,19 @@ export class DynamoDBConfigurationStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    new cdk.aws_dynamodb.Table(scope, `${id} 1`, {
-      tableName: "data",
+    new cdk.aws_dynamodb.Table(this, `TableData`, {
+      tableName: "Data",
       partitionKey: { name: "_id", type: AttributeType.STRING },
     });
 
-    new cdk.aws_dynamodb.Table(scope, `${id} 2`, {
-      tableName: "sensor",
+    new cdk.aws_dynamodb.Table(this, `TableSensor`, {
+      tableName: "Sensor",
       partitionKey: { name: "_id", type: AttributeType.STRING },
     });
+
+    // new cdk.aws_dynamodb.Table(this, `TablePlant`, {
+    //   tableName: "Plant",
+    //   partitionKey: { name: "_id", type: AttributeType.STRING },
+    // });
   }
 }
