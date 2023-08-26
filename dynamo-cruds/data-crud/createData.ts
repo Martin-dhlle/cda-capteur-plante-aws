@@ -11,7 +11,7 @@ export default async function createData(
   try {
     const newData: Data = {
       _id: randomUUID(),
-      generatedAt: new Date(),
+      generatedAt: new Date().toLocaleString(),
       humidityRate: humidityRate,
       sensorRef: sensorRef,
     };

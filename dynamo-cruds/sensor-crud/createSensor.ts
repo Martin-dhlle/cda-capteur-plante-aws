@@ -11,6 +11,7 @@ export default async function createSensor(
     const newSensor: Sensor = {
       _id: randomUUID(),
       serialNumber: serialNumber,
+      name: "DEFAULT",
     };
 
     await dynamo
@@ -22,7 +23,7 @@ export default async function createSensor(
 
     return newSensor;
   } catch (error) {
-    console.error("Error querying DynamoDB:", error);
+    console.error("Error creation in DynamoDB:", error);
     return null;
   }
 }

@@ -1,23 +1,51 @@
-import * as cdk from "aws-cdk-lib";
 import { AttributeType } from "aws-cdk-lib/aws-dynamodb";
+import {
+  App,
+  StackProps,
+  Stack,
+  aws_iam as iam,
+  aws_dynamodb as dynamoDb,
+} from "aws-cdk-lib";
 
-export class DynamoDBConfigurationStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+export class DynamoDBConfigurationStack extends Stack {
+  constructor(scope: App, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    new cdk.aws_dynamodb.Table(this, `TableData`, {
+    const tableData = new dynamoDb.Table(this, `TableData`, {
       tableName: "Data",
       partitionKey: { name: "_id", type: AttributeType.STRING },
     });
 
-    new cdk.aws_dynamodb.Table(this, `TableSensor`, {
+    const tableSensor = new dynamoDb.Table(this, `TableSensor`, {
       tableName: "Sensor",
       partitionKey: { name: "_id", type: AttributeType.STRING },
     });
 
-    // new cdk.aws_dynamodb.Table(this, `TablePlant`, {
-    //   tableName: "Plant",
-    //   partitionKey: { name: "_id", type: AttributeType.STRING },
-    // });
+    const tablePlant = new dynamoDb.Table(this, `TablePlant`, {
+      tableName: "Plant",
+      partitionKey: { name: "_id", type: AttributeType.STRING },
+    });
+
+    const dbAccessRole = new iam.Role(this, "DbAccessRole", {
+      roleName: "DbAccessRole",
+      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+    });
+
+    // Attach the DynamoDB query permission policy to the role
+    dbAccessRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: [
+          "dynamodb:Query",
+          "dynamodb:Scan",
+          "dynamodb:UpdateItem",
+          "dynamodb:PutItem",
+        ],
+        resources: [
+          tableData.tableArn,
+          tableSensor.tableArn,
+          tablePlant.tableArn,
+        ],
+      })
+    );
   }
 }

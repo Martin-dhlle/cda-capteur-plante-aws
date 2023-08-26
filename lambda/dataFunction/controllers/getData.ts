@@ -24,7 +24,7 @@ export default async function getData(event: APIGatewayProxyEvent) {
       headers: {
         "x-custom-header": "my custom header value",
       },
-      body: JSON.stringify({ message: "Ressource non trouvé" }),
+      body: JSON.stringify({ message: "Ressource non trouvé : sensor" }),
     };
   }
 
@@ -36,7 +36,7 @@ export default async function getData(event: APIGatewayProxyEvent) {
       headers: {
         "x-custom-header": "my custom header value",
       },
-      body: JSON.stringify({ message: "Ressource non trouvé" }),
+      body: JSON.stringify({ message: "Ressource non trouvé : data" }),
     };
   }
 
@@ -47,7 +47,7 @@ export default async function getData(event: APIGatewayProxyEvent) {
     },
     body: JSON.stringify({
       message: "données récupérées avec succes",
-      data: null,
+      data: data,
     }),
   };
 }

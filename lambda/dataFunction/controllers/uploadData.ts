@@ -34,7 +34,7 @@ export default async function uploadData(event: APIGatewayProxyEvent) {
       headers: {
         "x-custom-header": "my custom header value",
       },
-      body: JSON.stringify({ message: "Ressource non trouvé" }),
+      body: JSON.stringify({ message: "Problème de requête" }),
     };
   }
 

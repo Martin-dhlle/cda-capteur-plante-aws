@@ -8,18 +8,18 @@ export default async function fetchManyData(
   sensorRef: string
 ): Promise<Data[] | null> {
   try {
-    const sensors = await dynamo
-      .query({
+    const data = await dynamo
+      .scan({
         TableName: "Data",
-        KeyConditionExpression: `sensorRef = :sensorRef`,
+        FilterExpression: `sensorRef = :sensorRef`,
         ExpressionAttributeValues: {
           ":sensorRef": sensorRef,
         },
       })
       .promise();
 
-    if (sensors.Items && sensors.Items.length > 0) {
-      return sensors.Items as Data[];
+    if (data.Items && data.Items.length > 0) {
+      return data.Items as Data[];
     }
 
     return null;

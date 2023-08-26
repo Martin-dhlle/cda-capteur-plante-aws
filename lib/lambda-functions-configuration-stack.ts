@@ -1,39 +1,51 @@
-import * as cdk from "aws-cdk-lib";
-import { Code, Runtime } from "aws-cdk-lib/aws-lambda";
+import { App, StackProps, Stack, aws_iam as iam } from "aws-cdk-lib";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import * as apiGateway from "aws-cdk-lib/aws-apigateway";
 
-export class LambdaFunctionsConfigurationStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+export class LambdaFunctionsConfigurationStack extends Stack {
+  constructor(scope: App, id: string, props?: StackProps) {
     super(scope, id, props);
+
+    /**
+     * Roles IAM
+     */
+
+    const dbAccessRole = iam.Role.fromRoleName(
+      this,
+      "DbAccessRoleImport",
+      "DbAccessRole"
+    );
 
     /**
      * Functions
      * */
 
-    const dataFunctionHandler = new cdk.aws_lambda_nodejs.NodejsFunction(
+    const dataFunctionHandler = new NodejsFunction(this, "dataHandler", {
+      entry: "lambda/dataFunction/dataFunction.ts",
+      runtime: Runtime.NODEJS_14_X,
+      handler: "handler",
+      role: dbAccessRole,
+      bundling: {
+        externalModules: ["aws-sdk"],
+        minify: false,
+      },
+    });
+
+    const dataFunctionHandlerWithParam = new NodejsFunction(
       this,
-      "dataHandler",
+      "dataHandlerWithParam",
       {
         entry: "lambda/dataFunction/dataFunction.ts",
         runtime: Runtime.NODEJS_14_X,
-        handler: "handler",
+        handler: "handlerWithParam",
+        role: dbAccessRole,
         bundling: {
           externalModules: ["aws-sdk"],
           minify: false,
         },
       }
     );
-
-    const dataFunctionHandlerWithParam =
-      new cdk.aws_lambda_nodejs.NodejsFunction(this, "dataHandlerWithParam", {
-        entry: "lambda/dataFunction/dataFunction.ts",
-        runtime: Runtime.NODEJS_14_X,
-        handler: "handlerWithParam",
-        bundling: {
-          externalModules: ["aws-sdk"],
-          minify: false,
-        },
-      });
 
     /* const sensorFunctionHandler = new cdk.aws_lambda.Function(this, "sensor", {
       code: Code.fromAsset("lambda"),

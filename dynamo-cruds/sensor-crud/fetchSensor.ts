@@ -1,16 +1,16 @@
-import { DynamoDB } from "aws-sdk";
+import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import Sensor from "../../utils/interfaces/db/Sensor";
 
-const dynamo = new DynamoDB.DocumentClient();
+const dynamo = new DocumentClient();
 
 export default async function fetchSensor(
   serialNumber: string
 ): Promise<Sensor | null> {
   try {
     const sensors = await dynamo
-      .query({
+      .scan({
         TableName: "Sensor",
-        KeyConditionExpression: `serialNumber = :serialNumber`,
+        FilterExpression: `serialNumber = :serialNumber`,
         ExpressionAttributeValues: {
           ":serialNumber": serialNumber,
         },
