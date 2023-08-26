@@ -10,25 +10,30 @@ export class LambdaFunctionsConfigurationStack extends cdk.Stack {
      * Functions
      * */
 
-    const dataFunctionHandler = new cdk.aws_lambda.Function(
+    const dataFunctionHandler = new cdk.aws_lambda_nodejs.NodejsFunction(
       this,
       "dataHandler",
       {
-        code: Code.fromAsset("lambda"),
+        entry: "lambda/dataFunction/dataFunction.ts",
         runtime: Runtime.NODEJS_14_X,
-        handler: "dataFunction.handler",
+        handler: "handler",
+        bundling: {
+          externalModules: ["aws-sdk"],
+          minify: false,
+        },
       }
     );
 
-    const dataFunctionHandlerWithParam = new cdk.aws_lambda.Function(
-      this,
-      "dataHandlerWithParam",
-      {
-        code: Code.fromAsset("lambda"),
+    const dataFunctionHandlerWithParam =
+      new cdk.aws_lambda_nodejs.NodejsFunction(this, "dataHandlerWithParam", {
+        entry: "lambda/dataFunction/dataFunction.ts",
         runtime: Runtime.NODEJS_14_X,
-        handler: "dataFunction.handlerWithParam",
-      }
-    );
+        handler: "handlerWithParam",
+        bundling: {
+          externalModules: ["aws-sdk"],
+          minify: false,
+        },
+      });
 
     /* const sensorFunctionHandler = new cdk.aws_lambda.Function(this, "sensor", {
       code: Code.fromAsset("lambda"),
@@ -57,15 +62,15 @@ export class LambdaFunctionsConfigurationStack extends cdk.Stack {
     const plantRouteHttpMethodAvailables = ["GET"];
 
     dataRouteHttpMethodAvailables.forEach((method) =>
-      method === "GET"
-        ? // ajout d'une child route avec un request param sous la forme /:serialNumber
+      method === "GET" // si la méthode est GET...
+        ? // ...ajout d'une child route avec un request param sous la forme /:serialNumber
           dataRoute
             .addResource("{serialNumber}")
             .addMethod(
               method,
               new apiGateway.LambdaIntegration(dataFunctionHandlerWithParam)
             )
-        : // intègre seulement la méthode de la valeur de l'itération actuel
+        : // ... sinon, intègre seulement la méthode de la valeur de l'itération actuel
           dataRoute.addMethod(
             method,
             new apiGateway.LambdaIntegration(dataFunctionHandler)

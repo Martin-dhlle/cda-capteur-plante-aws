@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import createData from "./controllers/uploadData";
+import uploadData from "./controllers/uploadData";
 import getData from "./controllers/getData";
 
 export const handler = async (
@@ -7,7 +7,7 @@ export const handler = async (
 ): Promise<APIGatewayProxyResult> => {
   switch (event.httpMethod) {
     case "POST":
-      createData;
+      return await uploadData(event);
 
     default:
       return {
@@ -27,7 +27,7 @@ export const handlerWithParam = async (
 ): Promise<APIGatewayProxyResult> => {
   switch (event.httpMethod) {
     case "GET":
-      getData;
+      return await getData(event);
 
     default:
       return {
