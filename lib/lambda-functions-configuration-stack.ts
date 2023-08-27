@@ -36,7 +36,7 @@ export class LambdaFunctionsConfigurationStack extends Stack {
       this,
       "dataHandlerWithParam",
       {
-        entry: "lambda/sensorFunction/sensorFunction.ts",
+        entry: "lambda/sensorFunction/dataFunction.ts",
         runtime: Runtime.NODEJS_14_X,
         handler: "handlerWithParam",
         role: dbAccessRole,
