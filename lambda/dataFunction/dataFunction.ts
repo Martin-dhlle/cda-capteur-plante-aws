@@ -13,7 +13,9 @@ export const handler = async (
       return {
         statusCode: 500,
         headers: {
-          "x-custom-header": "my custom header value",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "Origin, X-Requested-With, Content-Type, Accept",
         },
         body: JSON.stringify({
           message: `méthode de requête non existante : ${event.httpMethod}`,
@@ -33,7 +35,9 @@ export const handlerWithParam = async (
       return {
         statusCode: 500,
         headers: {
-          "x-custom-header": "my custom header value",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers":
+            "Origin, X-Requested-With, Content-Type, Accept",
         },
         body: JSON.stringify({
           message: `méthode de requête non existante : ${event.httpMethod}`,

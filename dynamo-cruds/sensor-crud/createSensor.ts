@@ -12,6 +12,7 @@ export default async function createSensor(
       _id: randomUUID(),
       serialNumber: serialNumber,
       name: "DEFAULT",
+      timer: 1,
     };
 
     await dynamo

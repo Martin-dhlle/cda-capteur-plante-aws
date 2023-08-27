@@ -36,7 +36,22 @@ export class LambdaFunctionsConfigurationStack extends Stack {
       this,
       "dataHandlerWithParam",
       {
-        entry: "lambda/dataFunction/dataFunction.ts",
+        entry: "lambda/sensorFunction/sensorFunction.ts",
+        runtime: Runtime.NODEJS_14_X,
+        handler: "handlerWithParam",
+        role: dbAccessRole,
+        bundling: {
+          externalModules: ["aws-sdk"],
+          minify: false,
+        },
+      }
+    );
+
+    const sensorFunctionHandlerWithParam = new NodejsFunction(
+      this,
+      "sensorHandlerWithParam",
+      {
+        entry: "lambda/sensorFunction/sensorFunction.ts",
         runtime: Runtime.NODEJS_14_X,
         handler: "handlerWithParam",
         role: dbAccessRole,
@@ -63,14 +78,27 @@ export class LambdaFunctionsConfigurationStack extends Stack {
      * Api Gateway instanciate and add routing for data, sensor and plant
      */
 
-    const api = new apiGateway.RestApi(this, "ApiGateway").root;
+    const api = new apiGateway.RestApi(this, "ApiGateway", {
+      defaultCorsPreflightOptions: {
+        allowOrigins: ["*"],
+        allowMethods: ["GET", "POST", "PUT", "DELETE"],
+        allowHeaders: [
+          "Content-Type",
+          "X-Amz-Date",
+          "Authorization",
+          "X-Api-Key",
+          "X-Amz-Security-Token",
+        ],
+        allowCredentials: true,
+      },
+    }).root;
 
     const dataRoute = api.addResource("data");
-    /* const sensorRoute = api.addResource("sensor");
-    const plantRoute = api.addResource("plant"); */
+    const sensorRoute = api.addResource("sensor");
+    // const plantRoute = api.addResource("plant");
 
     const dataRouteHttpMethodAvailables = ["GET", "POST"];
-    const sensorRouteHttpMethodAvailables = ["GET", "PUT"];
+    const sensorRouteHttpMethodAvailables = ["GET"];
     const plantRouteHttpMethodAvailables = ["GET"];
 
     dataRouteHttpMethodAvailables.forEach((method) =>
@@ -89,12 +117,21 @@ export class LambdaFunctionsConfigurationStack extends Stack {
           )
     );
 
-    /* sensorRouteHttpMethodAvailables.forEach((method) =>
-      sensorRoute.addMethod(
-        method,
-        new apiGateway.LambdaIntegration(sensorFunctionHandler)
-      )
-    ); */
+    sensorRouteHttpMethodAvailables.forEach((method) =>
+      method === "GET" // si la méthode est GET...
+        ? // ...ajout d'une child route avec un request param sous la forme /:serialNumber
+          sensorRoute
+            .addResource("{serialNumber}")
+            .addMethod(
+              method,
+              new apiGateway.LambdaIntegration(sensorFunctionHandlerWithParam)
+            )
+        : // ... sinon, intègre seulement la méthode de la valeur de l'itération actuel
+          sensorRoute.addMethod(
+            method,
+            new apiGateway.LambdaIntegration(sensorFunctionHandlerWithParam)
+          )
+    );
 
     /* plantRouteHttpMethodAvailables.forEach((method) =>
       plantRoute.addMethod(

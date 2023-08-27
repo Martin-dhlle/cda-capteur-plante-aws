@@ -1,10 +1,8 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import fetchManyData from "../../../dynamo-cruds/data-crud/fetchManyData";
 import fetchSensor from "../../../dynamo-cruds/sensor-crud/fetchSensor";
 import Sensor from "../../../utils/interfaces/db/Sensor";
-import Data from "../../../utils/interfaces/db/Data";
 
-export default async function getData(
+export default async function getSensor(
   event: APIGatewayProxyEvent
 ): Promise<APIGatewayProxyResult> {
   const serialNumber = event.pathParameters?.serialNumber;
@@ -34,18 +32,6 @@ export default async function getData(
     };
   }
 
-  const data: Data[] | null = await fetchManyData(sensor._id);
-
-  if (data === null) {
-    return {
-      statusCode: 404,
-      headers: {
-        "x-custom-header": "my custom header value",
-      },
-      body: JSON.stringify({ message: "Ressource non trouvé : data" }),
-    };
-  }
-
   return {
     statusCode: 200,
     headers: {
@@ -55,7 +41,7 @@ export default async function getData(
     },
     body: JSON.stringify({
       message: "données récupérées avec succes",
-      data: data,
+      data: sensor,
     }),
   };
 }
