@@ -40,7 +40,9 @@ export default async function getData(
     return {
       statusCode: 404,
       headers: {
-        "x-custom-header": "my custom header value",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers":
+          "Origin, X-Requested-With, Content-Type, Accept",
       },
       body: JSON.stringify({ message: "Ressource non trouvé : data" }),
     };
