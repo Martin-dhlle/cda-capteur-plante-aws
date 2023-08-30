@@ -75,7 +75,7 @@ export class LambdaFunctionsConfigurationStack extends Stack {
     }); */
 
     /**
-     * Api Gateway instanciate and add routing for data, sensor and plant
+     * Api Gateway instanciate and add routing for data, sensor and plant + ApiKey
      */
 
     const api = new apiGateway.RestApi(this, "ApiGateway", {
@@ -91,10 +91,11 @@ export class LambdaFunctionsConfigurationStack extends Stack {
         ],
         allowCredentials: true,
       },
-    }).root;
+    });
+    api.addApiKey("ApiKeyCDA");
 
-    const dataRoute = api.addResource("data");
-    const sensorRoute = api.addResource("sensor");
+    const dataRoute = api.root.addResource("data");
+    const sensorRoute = api.root.addResource("sensor");
     // const plantRoute = api.addResource("plant");
 
     const dataRouteHttpMethodAvailables = ["GET", "POST"];
